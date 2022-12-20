@@ -2,6 +2,9 @@
 
 A simple program to bring to Influx your SmartThings data through the SmartThings API. No SmartApp installation needed.
 
+This is a fork from eargollo/smartthings-influx.  This version assumes you have an existing InfluxDB and Grafana installation that are
+up and running and do not need to be replaced.  This is useful if migrating from the smartthings influx app.
+
 ## Getting started
 
 If you have Docker and Docker Compose, you get started in just 3 steps.
@@ -18,10 +21,6 @@ Run Docker Compose:
 ```
 $ UID=$(id -u) GID=$(id -g) docker-compose up
 ```
-
-Go to [Grafana inteface](http://localhost:3000) and log with user `admin` and password `password`.
-
-There is already a pre-provisioned Grafana dashboard to hold your SmartThings data. In Grafana go to Dashboards->Manage and there click on Smartthings.
 
 Have fun!
 
