@@ -8,6 +8,17 @@ monitor:
   - battery
   - powerMeter
   - thermostatOperatingState
+  - contactSensor
+  - energyMeter
+  - lock
+  - motionSensor
+  - waterSensor
+  - valve
+  - switch
+  - switchLevel
+  - temperature
+  - presenceSensor
+  - voltageMeasurement
 period: 120
 influxurl: http://influxdb:8086
 influxuser: admin
