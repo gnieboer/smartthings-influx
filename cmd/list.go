@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/eargollo/smartthings-influx/pkg/smartthings"
+	"github.com/gnieboer/smartthings-influx/pkg/smartthings"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

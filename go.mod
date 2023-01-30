@@ -1,4 +1,4 @@
-module github.com/eargollo/smartthings-influx
+module github.com/gnieboer/smartthings-influx
 
 go 1.19
 

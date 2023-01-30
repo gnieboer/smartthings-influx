@@ -18,8 +18,8 @@ package cmd
 import (
 	"log"
 
-	"github.com/eargollo/smartthings-influx/pkg/monitor"
-	"github.com/eargollo/smartthings-influx/pkg/smartthings"
+	"github.com/gnieboer/smartthings-influx/pkg/monitor"
+	"github.com/gnieboer/smartthings-influx/pkg/smartthings"
 	"github.com/influxdata/influxdb/client/v2"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

@@ -8,7 +8,7 @@ import (
 	retry "github.com/avast/retry-go"
 	"github.com/google/uuid"
 
-	"github.com/eargollo/smartthings-influx/pkg/smartthings"
+	"github.com/gnieboer/smartthings-influx/pkg/smartthings"
 	"github.com/influxdata/influxdb/client/v2"
 )
 
