@@ -7,15 +7,23 @@ up and running and do not need to be replaced.  This is useful if migrating from
 
 ## Getting started
 
-If you have Docker and Docker Compose, you get started in just 3 steps.
+If you have Docker, you can get started in just 6 steps.
 
 - Step 1: Create an SmartThings API token
 
 Go to [SmartThings API Token](https://account.smartthings.com/tokens) page and create a token. Make sure you give full access to devices.
 
-- Step 2: Either place the token at the `docker-compose-config.yml` file or set the APITOKEN environment variable `export APITOKEN=YOUR-TOKEN-HERE`
+- Step 2: Copy the .smarthings-influx.sample.yaml to .smartthings-influx.yaml and save in a location accessible to your Docker runtime
 
-- Step 3: Bring the stack up and see your Grafana chart
+- Step 3: Modify the yaml file to include your API token, and the location / credentials for your existing InfluxDB instance
+          (Alternatively, you can use environment variables during container creation, but you still need to map to this file)
+
+- Step 4: Pull the docker container gcndevelopment/smartthingsinflux (note the lack of hyphen)
+
+- Step 5: Create a container and map a folder from where you saved the config file to /config in the container
+
+- Step 6: Run and watch the data come in.  If you run both groovy and this simultaneously, you can filter on entries from here by filtering
+          on tag "source" = "docker"
 
 Run Docker Compose:
 ```
@@ -31,7 +39,7 @@ Build the executable
 $ make build
 ```
 
-Create the `.smartthings-influx.yaml` file either at your home folder or at the folder where you run the program:
+Create the `.smartthings-influx.yaml` file either at your home folder, /config, or at the folder where you run the program:
 
 ```yaml
 apitoken: <put your SmartThings API token here or export APITOKEN env var>
