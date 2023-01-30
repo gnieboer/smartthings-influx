@@ -65,6 +65,7 @@ func initConfig() {
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
+		fmt.Fprintln(os.Stderr, "config file specified as:", cfgFile)
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()
@@ -72,10 +73,11 @@ func initConfig() {
 
 		// Search config in home directory with name ".smartthings-influx" (without extension).
 		viper.AddConfigPath(home)
+		viper.AddConfigPath("/config")
 		viper.AddConfigPath(".")
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".smartthings-influx")
-
+		fmt.Fprintln(os.Stderr, "Checking for config file at: ", home)
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -83,5 +85,7 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Fprintln(os.Stderr, "Config file not found")
 	}
 }

@@ -45,7 +45,7 @@ func (mon Monitor) Run() error {
 			continue
 		}
 		if len(devices.Items) == 0 {
-			log.Printf("ERROR: no devices with any of the metrics: %s", strings.Join(mon.metrics, ", "))
+			log.Printf("ERROR: no devices with any of the metrics: (%s)", strings.Join(mon.metrics, ", "))
 			continue
 		}
 

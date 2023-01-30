@@ -17,6 +17,8 @@ package cmd
 
 import (
 	"log"
+	"fmt"
+	"os"
 
 	"github.com/gnieboer/smartthings-influx/pkg/monitor"
 	"github.com/gnieboer/smartthings-influx/pkg/smartthings"
@@ -39,6 +41,7 @@ var monitorCmd = &cobra.Command{
 			Username: viper.GetString("influxuser"),
 			Password: viper.GetString("influxpassword"),
 		})
+		fmt.Fprintln(os.Stderr, "url: ", viper.GetString("influxurl"))
 		if err != nil {
 			log.Fatalln("Error: ", err)
 		}
