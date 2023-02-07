@@ -81,6 +81,25 @@ func (c Client) ConvertValueToFloat(metric string, value any) (float64, error) {
 	return 0, nil
 }
 
+// Only convert items to binary that have an explicit mapping in the value otherwise return -1
+func (c Client) ConvertValueToBinary(metric string, value any) (int8, error) {
+	_, ok := value.(string)
+	if ok {
+		stValue := value.(string)
+		// Check if there is a map for metric
+		metricMap, ok := c.conversionMap[metric]
+		if !ok {
+			return -1, nil
+		}
+		intVal := int8(metricMap[stValue])
+		if (intVal < 2 && intVal > -1) {
+			return intVal, nil
+		}
+		return -1, nil
+	}
+	return -1, nil
+}
+
 func (c Client) Devices() (devices DevicesList, err error) {
 	data, err := c.get("/devices")
 	if err != nil {
@@ -126,6 +145,10 @@ type CapabilityStatus struct {
 
 func (status CapabilityStatus) FloatValue(metric string) (float64, error) {
 	return cli.ConvertValueToFloat(metric, status.Value)
+}
+
+func (status CapabilityStatus) BinaryValue(metric string) (int8, error) {
+	return cli.ConvertValueToBinary(metric, status.Value)
 }
 
 func (c Client) DeviceCapabilityStatus(deviceID uuid.UUID, componentId string, capabilityId string) (status map[string]CapabilityStatus, err error) {

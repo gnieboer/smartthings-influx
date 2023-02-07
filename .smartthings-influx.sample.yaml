@@ -1,4 +1,4 @@
-apitoken: <put your SmartThings API token here>
+apitoken: < YOUR API TOKEN HERE> 
 monitor:
   - light
   - temperatureMeasurement
@@ -20,11 +20,20 @@ monitor:
   - presenceSensor
   - voltageMeasurement
 period: 120
-influxurl: http://localhost:8086
-influxuser: user
+influxurl: http://influxdb:8086
+influxuser: username
 influxpassword: password
-influxdatabase: database
+influxdatabase: smartthings
 valuemap:
-  switch: 
+  switch:
     off: 0
     on: 1
+  presence:
+    present: 1
+    not present: 0
+  water:
+    wet: 1
+    dry: 0
+  motion:
+    active: 1
+    inactive: 0
