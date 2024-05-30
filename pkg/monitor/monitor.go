@@ -60,7 +60,7 @@ func (mon Monitor) Run() error {
 		}
 
 		for i, dev := range devices.Items {
-			// log.Printf("%d: Monitoring '%s' from device '%s' (%s)", i, dev.Capability.Id, dev.Device.Label, dev.Device.DeviceId)
+			// log.Printf("%d: Monitoring '%s' from device '%s' (%s)", i, dev.Capability.Id, devLabel, dev.Device.DeviceId)
 			// Get measurement
 			status, err := dev.Status()
 			if err != nil {
@@ -72,6 +72,16 @@ func (mon Monitor) Run() error {
 
 				fields := make(map[string]interface{})
 
+				var deviceId, devLabel string
+
+				if dev.Component.Id != "main" {
+					deviceId = dev.Device.DeviceId.String() + dev.Component.Id
+					devLabel = dev.Device.Label + " " + dev.Component.Id
+				} else {
+					deviceId = dev.Device.DeviceId.String()
+					devLabel = dev.Device.Label
+				}
+
 				// In the groovy logger, 'value' is sent as a string unless it's a number
 				// Then there is a conversion done to some strings to create a binary
 				// and store it in valueBinary
@@ -80,7 +90,7 @@ func (mon Monitor) Run() error {
 				// though probably it's not needed.
 
 				if val.Value == nil {
-					log.Printf("%3d: WARNING:  %-22s %-27s got nil metric value: %v", i, dev.Device.Label, dev.Capability.Id, err)
+					log.Printf("%3d: WARNING:  %-22s %-27s got nil metric value: %v", i, devLabel, dev.Capability.Id, err)
 					continue
 				} else {
 					_, ok := val.Value.(float64)
@@ -94,7 +104,7 @@ func (mon Monitor) Run() error {
 				// Get converted float value
 				convValue, err := val.FloatValue(key)
 				if err != nil {
-					log.Printf("%3d: ERROR: could not convert %-22s %-27s to number %v", i, dev.Device.Label, dev.Capability.Id, err)
+					log.Printf("%3d: ERROR: could not convert %-22s %-27s to number %v", i, devLabel, dev.Capability.Id, err)
 					continue
 				} else {
 					fields["valueFloat"] = convValue
@@ -103,7 +113,7 @@ func (mon Monitor) Run() error {
 				// Get converted binary value
 				binaryValue, err := val.BinaryValue(key)
 				if err != nil {
-					log.Printf("%3d: ERROR: could not convert %-22s %-27s to binary %v", i, dev.Device.Label, dev.Capability.Id, err)
+					log.Printf("%3d: ERROR: could not convert %-22s %-27s to binary %v", i, devLabel, dev.Capability.Id, err)
 					continue
 				} else {
 					fields["valueBinary"] = binaryValue
@@ -111,20 +121,20 @@ func (mon Monitor) Run() error {
 
 				// log.Printf("Key is %s value %v number value %f binary value %d", key, val, convValue, binaryValue)
 
-				if lastUpdate[dev.Device.DeviceId.String()+key] == val.Timestamp {
+				if lastUpdate[deviceId+key] == val.Timestamp {
 					if time.Now().Minute() < (mon.interval / 60) {
 						action := "HOURLY "
 						val.Timestamp = time.Now()
-						log.Printf("%3d: %-22s %-27s: %s time: %33s value: %12s%1s number: %4.1f binary: %2d", i, dev.Device.Label, dev.Capability.Id, action, val.Timestamp, fmt.Sprintf("%v", val.Value), val.Unit, convValue, binaryValue)
+						log.Printf("%3d: %-22s %-27s %s: %s time: %33s value: %12s%1s number: %4.1f binary: %2d", i, devLabel, dev.Capability.Id, dev.Component.Id, action, val.Timestamp, fmt.Sprintf("%v", val.Value), val.Unit, convValue, binaryValue)
 					} else {
 						action := "SKIPPED"
-						log.Printf("%3d: %-22s %-27s: %s time: %33s value: %12s%1s number: %4.1f binary: %2d", i, dev.Device.Label, dev.Capability.Id, action, val.Timestamp, fmt.Sprintf("%v", val.Value), val.Unit, convValue, binaryValue)
-						newLastUpdate[dev.Device.DeviceId.String()+key] = val.Timestamp
+						log.Printf("%3d: %-22s %-27s %s: %s time: %33s value: %12s%1s number: %4.1f binary: %2d", i, devLabel, dev.Capability.Id, dev.Component.Id, action, val.Timestamp, fmt.Sprintf("%v", val.Value), val.Unit, convValue, binaryValue)
+						newLastUpdate[deviceId+key] = val.Timestamp
 						continue
 					}
 				} else {
 					action := "CHANGED"
-					log.Printf("%3d: %-22s %-27s: %s time: %33s value: %12s%1s number: %4.1f binary: %2d", i, dev.Device.Label, dev.Capability.Id, action, val.Timestamp, fmt.Sprintf("%v", val.Value), val.Unit, convValue, binaryValue)
+					log.Printf("%3d: %-22s %-27s %s: %s time: %33s value: %12s%1s number: %4.1f binary: %2d", i, devLabel, dev.Capability.Id, dev.Component.Id, action, val.Timestamp, fmt.Sprintf("%v", val.Value), val.Unit, convValue, binaryValue)
 				}
 
 				// Data format from Codesaur's groovy version
@@ -135,8 +145,8 @@ func (mon Monitor) Run() error {
 				// Create point
 
 				tags := map[string]string{
-					"deviceId":   dev.Device.DeviceId.String(),
-					"deviceName": dev.Device.Label,
+					"deviceId":   deviceId,
+					"deviceName": devLabel,
 					// "groupId":    dev.Device.groupId,
 					// "groupName":  dev.Device.groupName,
 					// "hubId":      dev.Device.hubId,
@@ -160,7 +170,7 @@ func (mon Monitor) Run() error {
 				}
 
 				bp.AddPoint(point)
-				newLastUpdate[dev.Device.DeviceId.String()+key] = val.Timestamp
+				newLastUpdate[deviceId+key] = val.Timestamp
 			}
 		}
 
