@@ -101,6 +101,12 @@ func (mon Monitor) Run() error {
 					}
 				}
 
+				// Special routine that will set battery level to 0% if we haven't gotten an update on battery levels for 24 hours
+				if val.Timestamp.Sub(time.Now()).Hours() > 24 && dev.Capability.Id == "battery" {
+					log.Printf("WARNING: Likely dead battery on %s", devLabel)
+					fields["value"] = 0
+				}
+
 				// Get converted float value
 				convValue, err := val.FloatValue(key)
 				if err != nil {
