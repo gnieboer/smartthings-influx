@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -72,7 +73,7 @@ func (c Client) ConvertValueToFloat(metric string, value any) (float64, error) {
 	if ok {
 		stValue := value.(string)
 		// Check if there is a map for metric
-		metricMap, ok := c.conversionMap[metric]
+		metricMap, ok := c.conversionMap[strings.ToLower(metric)]
 		if !ok {
 			return 0, fmt.Errorf("there is no value map for metric '%s' and value '%s', can't convert", metric, stValue)
 		}
