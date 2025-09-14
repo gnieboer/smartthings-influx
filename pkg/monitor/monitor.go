@@ -103,29 +103,39 @@ func (mon Monitor) Run() error {
 
 				// Special routine that will set battery level to 0% if we haven't gotten an update on battery levels for 24 hours
 				// Or if the device health is offline or unhealthy
+				var convValue float64
+				var binaryValue int8
 				if (time.Until(val.Timestamp).Hours() > 24 || dev.Device.Health.State != "ONLINE") && dev.Capability.Id == "battery" {
 					log.Printf("WARNING: Likely dead battery on %s", devLabel)
 					fields["value"] = 0
-				}
-
-				// Get converted float value
-				convValue, err := val.FloatValue(key)
-				if err != nil {
-					log.Printf("%3d: ERROR: could not convert %-22s %-27s to number %v", i, devLabel, dev.Capability.Id, err)
-					continue
-				} else {
+					convValue = 0.0
 					fields["valueFloat"] = convValue
-				}
-
-				// Get converted binary value
-				binaryValue, err := val.BinaryValue(key)
-				if err != nil {
-					log.Printf("%3d: ERROR: could not convert %-22s %-27s to binary %v", i, devLabel, dev.Capability.Id, err)
-					continue
-				} else {
+					binaryValue = 0
 					fields["valueBinary"] = binaryValue
-				}
+					val.Value = 0
+					if dev.Device.Health.State != "ONLINE" {
+							val.Timestamp = dev.Device.Health.LastUpdated
+					}
+				} else {
 
+					// Get converted float value
+					convValue, err := val.FloatValue(key)
+					if err != nil {
+						log.Printf("%3d: ERROR: could not convert %-22s %-27s to number %v", i, devLabel, dev.Capability.Id, err)
+						continue
+					} else {
+						fields["valueFloat"] = convValue
+					}
+
+					// Get converted binary value
+					binaryValue, err := val.BinaryValue(key)
+					if err != nil {
+						log.Printf("%3d: ERROR: could not convert %-22s %-27s to binary %v", i, devLabel, dev.Capability.Id, err)
+						continue
+					} else {
+						fields["valueBinary"] = binaryValue
+					}
+				}
 				// log.Printf("Key is %s value %v number value %f binary value %d", key, val, convValue, binaryValue)
 
 				if lastUpdate[deviceId+key].Equal(val.Timestamp) {
