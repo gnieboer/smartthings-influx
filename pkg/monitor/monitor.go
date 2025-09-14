@@ -114,7 +114,7 @@ func (mon Monitor) Run() error {
 					fields["valueBinary"] = binaryValue
 					val.Value = 0
 					if dev.Device.Health.State != "ONLINE" {
-							val.Timestamp = dev.Device.Health.LastUpdated
+						val.Timestamp = dev.Device.Health.LastUpdated
 					}
 				} else {
 
@@ -209,6 +209,8 @@ func (mon Monitor) Run() error {
 		} else {
 			log.Printf("No new read since last update")
 		}
+		// Yes this is a bit of a hack, but it gives a quick reference to the version running
+		log.Printf("Version 1.0.2")
 
 	}
 }
