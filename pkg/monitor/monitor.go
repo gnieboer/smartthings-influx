@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 	"time"
+	"slices"
 
 	retry "github.com/avast/retry-go"
 
@@ -18,10 +19,11 @@ type Monitor struct {
 	database string
 	metrics  []string
 	interval int
+	ignore   []string
 }
 
-func New(st *smartthings.Client, influx client.HTTPClient, database string, metrics []string, interval int) *Monitor {
-	return &Monitor{st: st, influx: influx, database: database, metrics: metrics, interval: interval}
+func New(st *smartthings.Client, influx client.HTTPClient, database string, metrics []string, interval int, ignore []string) *Monitor {
+	return &Monitor{st: st, influx: influx, database: database, metrics: metrics, interval: interval, ignore: ignore}
 }
 
 func (mon Monitor) Run() error {
@@ -70,6 +72,12 @@ func (mon Monitor) Run() error {
 
 			for key, val := range status {
 
+				if slices.Contains(mon.ignore, key) {
+					log.Printf("%3d: INFO:   %-22s %-27s %s is in ignore list, skipping", i, dev.Device.Label, dev.Capability.Id, key)
+					continue
+				}
+			
+
 				fields := make(map[string]interface{})
 
 				var deviceId, devLabel string
@@ -90,7 +98,7 @@ func (mon Monitor) Run() error {
 				// though probably it's not needed.
 
 				if val.Value == nil {
-					log.Printf("%3d: WARNING:  %-22s %-27s got nil metric value: %v", i, devLabel, dev.Capability.Id, err)
+					log.Printf("%3d: WARNING:  %-22s %-27s %s got nil metric value: %v", i, devLabel, dev.Capability.Id, key, err)
 					continue
 				} else {
 					_, ok := val.Value.(float64)

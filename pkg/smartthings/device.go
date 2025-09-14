@@ -1,14 +1,15 @@
 package smartthings
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Device struct {
-	DeviceId   uuid.UUID   `json:"deviceId"`
-	Name       string      `json:"name"`
-	Label      string      `json:"label"`
+	DeviceId   uuid.UUID `json:"deviceId"`
+	Name       string    `json:"name"`
+	Label      string    `json:"label"`
 	Health     Health
 	Components []Component `json:"components"`
 }
@@ -20,9 +21,9 @@ type Component struct {
 }
 
 type Health struct {
-	Id		 		string 		`json:"deviceId"`
-	State 			string 		`json:"state"`
-	LastUpdated 	time.Time	`json:"lastUpdatedDate"`
+	DeviceId    uuid.UUID `json:"deviceId"`
+	State       string    `json:"state"`
+	LastUpdated time.Time `json:"lastUpdatedDate"`
 }
 
 type Capability struct {
