@@ -107,12 +107,12 @@ func (mon Monitor) Run() error {
 				var binaryValue int8
 				if (time.Until(val.Timestamp).Hours() > 24 || dev.Device.Health.State != "ONLINE") && dev.Capability.Id == "battery" {
 					log.Printf("WARNING: Likely dead battery on %s", devLabel)
-					fields["value"] = 0
+					fields["value"] = 0.0
 					convValue = 0.0
 					fields["valueFloat"] = convValue
 					binaryValue = 0
 					fields["valueBinary"] = binaryValue
-					val.Value = 0
+					val.Value = 0.0
 					if dev.Device.Health.State != "ONLINE" {
 						val.Timestamp = dev.Device.Health.LastUpdated
 					}
