@@ -5,7 +5,7 @@ import (
 )
 
 type DevicesList struct {
-	Items  []Device `json:"items"`
+	Items  []*Device `json:"items"`
 	client *Client
 }
 
@@ -14,7 +14,7 @@ type DevicesWithCapabilitiesResult struct {
 }
 
 type DeviceWithCapability struct {
-	Device     Device
+	Device     *Device
 	Component  Component
 	Capability Capability
 	client     *Client

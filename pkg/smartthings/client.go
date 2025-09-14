@@ -118,6 +118,11 @@ func (c Client) DevicesWithCapabilities(capabilities []string) (list DevicesWith
 		return
 	}
 
+	// Update device health for each device
+	for _, device := range data.Items {
+		device.UpdateHealth()
+	}
+
 	list = data.DevicesWithCapabilities(capabilities)
 	return
 }
@@ -136,6 +141,19 @@ func (c Client) DeviceStatus(deviceID uuid.UUID) (status DeviceStatus, err error
 	err = json.Unmarshal([]byte(data), &status)
 	return status, err
 }
+
+func (c Client) DeviceHealth(deviceID uuid.UUID) (health Health, err error) {
+	url := "/devices/" + deviceID.String() + "/health"
+
+	data, err := c.get(url)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal([]byte(data), &health)
+	return health, err
+}
+
 
 type CapabilityStatus struct {
 	Timestamp time.Time `json:"timestamp"`

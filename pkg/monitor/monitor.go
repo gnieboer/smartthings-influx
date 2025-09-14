@@ -102,7 +102,8 @@ func (mon Monitor) Run() error {
 				}
 
 				// Special routine that will set battery level to 0% if we haven't gotten an update on battery levels for 24 hours
-				if time.Until(val.Timestamp).Hours() > 24 && dev.Capability.Id == "battery" {
+				// Or if the device health is offline or unhealthy
+				if (time.Until(val.Timestamp).Hours() > 24 || dev.Device.Health.State != "ONLINE") && dev.Capability.Id == "battery" {
 					log.Printf("WARNING: Likely dead battery on %s", devLabel)
 					fields["value"] = 0
 				}
