@@ -19,6 +19,14 @@ monitor:
   - temperature
   - presenceSensor
   - voltageMeasurement
+ignoredvalues:
+  - supportedLockValues
+  - supportedUnlockDirections
+  - supportedLockCommands
+  - levelRange
+  - temperatureRange 
+  - quantity
+  - type
 period: 120
 influxurl: http://influxdb:8086
 influxuser: username
@@ -37,3 +45,22 @@ valuemap:
   motion:
     active: 1
     inactive: 0
+  thermostatOperatingState:
+    heating: 1
+    cooling: 1
+    idle: 0
+  lock:
+    locked: 1
+    unlocked: 0
+  contact:
+    closed: 0
+    open: 1
+  windowShade:
+    closed: 0
+    open: 1
+  door:
+    closed: 1
+    open: 0
+    opening: 0
+    closing: 0
+    unknown: 0
