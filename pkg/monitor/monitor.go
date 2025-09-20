@@ -3,9 +3,9 @@ package monitor
 import (
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 	"time"
-	"slices"
 
 	retry "github.com/avast/retry-go"
 
@@ -76,7 +76,6 @@ func (mon Monitor) Run() error {
 					log.Printf("%3d: INFO:   %-22s %-27s %s is in ignore list, skipping", i, dev.Device.Label, dev.Capability.Id, key)
 					continue
 				}
-			
 
 				fields := make(map[string]interface{})
 
@@ -121,6 +120,8 @@ func (mon Monitor) Run() error {
 					binaryValue = 0
 					fields["valueBinary"] = binaryValue
 					val.Value = 0.0
+					// Set timestamp to 10 seconds later so the state change to offline will trigger a record update
+					val.Timestamp = val.Timestamp.Add(10 * time.Second)
 					if dev.Device.Health.State != "ONLINE" {
 						val.Timestamp = dev.Device.Health.LastUpdated
 					}
@@ -178,6 +179,7 @@ func (mon Monitor) Run() error {
 					// "hubName":    dev.Device.hubName,
 					"component":  dev.Component.Id,
 					"capability": dev.Capability.Id,
+					"health":     dev.Device.Health.State,
 					"unit":       val.Unit,
 					"source":     "docker",
 				}
