@@ -96,6 +96,9 @@ func (mon Monitor) Run() error {
 				// but still retain the valueFloat from the original package
 				// though probably it's not needed.
 
+				// save the health state as a value
+				fields["health"] = dev.Device.Health.State
+
 				if val.Value == nil {
 					log.Printf("%3d: WARNING:  %-22s %-27s %s got nil metric value: %v", i, devLabel, dev.Capability.Id, key, err)
 					continue
@@ -220,7 +223,7 @@ func (mon Monitor) Run() error {
 			log.Printf("No new read since last update")
 		}
 		// Yes this is a bit of a hack, but it gives a quick reference to the version running
-		log.Printf("Version 1.0.2")
+		log.Printf("Version 1.0.3")
 
 	}
 }
