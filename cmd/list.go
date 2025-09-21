@@ -38,14 +38,14 @@ var listCmd = &cobra.Command{
 			log.Fatalf("Error initializing SmartThings client: %v", err)
 		}
 
-		smartthings.Init(viper.GetString("apitoken"), convMap)
-		list, err := smartthings.Devices()
+		var cli = smartthings.Init(viper.GetString("apitoken"), convMap)
+		list, err := cli.GetDevices()
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		for i, d := range list.Items {
+		for i, d := range list.Devices {
 			fmt.Printf("%d: %s, %s, %s\n", i, d.DeviceId, d.Name, d.Label)
 			for _, comp := range d.Components {
 				for _, cap := range comp.Capabilities {

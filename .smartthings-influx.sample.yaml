@@ -64,3 +64,7 @@ valuemap:
     opening: 0
     closing: 0
     unknown: 0
+  health:
+    online: 1
+    offline: 0
+    unhealthy: 0

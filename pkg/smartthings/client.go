@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -59,10 +58,6 @@ func ParseConversionMap(valuemap map[string]interface{}) (map[string]map[string]
 	return conversionMap, nil
 }
 
-func Devices() (DevicesList, error) {
-	return cli.Devices()
-}
-
 func (c Client) ConvertValueToFloat(metric string, value any) (float64, error) {
 	_, ok := value.(float64)
 	if ok {
@@ -93,7 +88,7 @@ func (c Client) ConvertValueToBinary(metric string, value any) (int8, error) {
 			return -1, nil
 		}
 		intVal := int8(metricMap[stValue])
-		if (intVal < 2 && intVal > -1) {
+		if intVal < 2 && intVal > -1 {
 			return intVal, nil
 		}
 		return -1, nil
@@ -101,7 +96,7 @@ func (c Client) ConvertValueToBinary(metric string, value any) (int8, error) {
 	return -1, nil
 }
 
-func (c Client) Devices() (devices DevicesList, err error) {
+func (c Client) GetDevices() (devices DevicesList, err error) {
 	data, err := c.get("/devices")
 	if err != nil {
 		return
@@ -110,25 +105,15 @@ func (c Client) Devices() (devices DevicesList, err error) {
 	err = json.Unmarshal([]byte(data), &devices)
 	devices.client = &c
 
-	return
-}
-
-func (c Client) DevicesWithCapabilities(capabilities []string) (list DevicesWithCapabilitiesResult, err error) {
-	data, err := c.Devices()
-	if err != nil {
-		return
-	}
-
 	// Update device health for each device
-	for _, device := range data.Items {
+	for _, device := range devices.Devices {
 		device.UpdateHealth()
 	}
 
-	list = data.DevicesWithCapabilities(capabilities)
 	return
 }
 
-func (c Client) DeviceStatus(deviceID uuid.UUID) (status DeviceStatus, err error) {
+func (c Client) GetDeviceStatus(deviceID uuid.UUID) (status DeviceStatus, err error) {
 	url := "/devices/" + deviceID.String() + "/status"
 
 	data, err := c.get(url)
@@ -136,14 +121,11 @@ func (c Client) DeviceStatus(deviceID uuid.UUID) (status DeviceStatus, err error
 		return
 	}
 
-	// log.Printf(string(data))
-	status = DeviceStatus{}
-
 	err = json.Unmarshal([]byte(data), &status)
-	return status, err
+	return 
 }
 
-func (c Client) DeviceHealth(deviceID uuid.UUID) (health Health, err error) {
+func (c Client) GetDeviceHealth(deviceID uuid.UUID) (health Health, err error) {
 	url := "/devices/" + deviceID.String() + "/health"
 
 	data, err := c.get(url)
@@ -152,53 +134,24 @@ func (c Client) DeviceHealth(deviceID uuid.UUID) (health Health, err error) {
 	}
 
 	err = json.Unmarshal([]byte(data), &health)
-	return health, err
+	return 
 }
 
-
-type CapabilityStatus struct {
-	Timestamp time.Time `json:"timestamp"`
-	Unit      string    `json:"unit"`
-	Value     any       `json:"value"`
-}
-
-func (status CapabilityStatus) FloatValue(metric string) (float64, error) {
-	return cli.ConvertValueToFloat(metric, status.Value)
-}
-
-func (status CapabilityStatus) BinaryValue(metric string) (int8, error) {
-	return cli.ConvertValueToBinary(metric, status.Value)
-}
-
-func (c Client) DeviceCapabilityStatus(deviceID uuid.UUID, componentId string, capabilityId string) (status map[string]CapabilityStatus, err error) {
+// Currently not used
+func (c Client) GetDeviceCapabilityStatus(deviceID uuid.UUID, componentId string, capabilityId string) (status map[string]CapabilityStatus, err error) {
 	url := "/devices/" + deviceID.String() + "/components/" + componentId + "/capabilities/" + capabilityId + "/status"
 
-	// log.Printf("Endpoint is '%s'", url)
 	data, err := c.get(url)
 	if err != nil {
 		return
 	}
-
-	// log.Printf("Status for device '%s' component '%s' capability '%s' payload is '%s' ",
-	// 	deviceID,
-	// 	componentId,
-	// 	capabilityId,
-	// 	string(data),
-	// )
 
 	err = json.Unmarshal(data, &status)
 	if err != nil {
 		return status, fmt.Errorf("could not unmarshall device capability status payload: '%s'", string(data))
 	}
 
-	// log.Printf("Unmarshalled status for device '%s' component '%s' capability '%s' payload is '%v' ",
-	// 	deviceID,
-	// 	componentId,
-	// 	capabilityId,
-	// 	status,
-	// )
-
-	return status, err
+	return 
 }
 
 func (c Client) get(endpoint string) ([]byte, error) {
@@ -226,3 +179,4 @@ func (c Client) get(endpoint string) ([]byte, error) {
 
 	return body, nil
 }
+

@@ -37,14 +37,14 @@ var statusCmd = &cobra.Command{
 		}
 
 		var cli = smartthings.Init(viper.GetString("apitoken"), convMap)
-		list, err := smartthings.Devices()
+		list, err := cli.GetDevices()
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		if len(args) == 0 {
 			log.Printf("Listing health of all devices")
-			for i, d := range list.Items {
+			for i, d := range list.Devices {
 				health, err := d.UpdateHealth()
 				if err != nil {
 					log.Printf("Error getting health for device %s: %v", d.Label, err)
@@ -54,26 +54,19 @@ var statusCmd = &cobra.Command{
 			}
 
 			log.Printf("Listing status of all devices")
-			for i, d := range list.Items {
-				status, _ := d.Status()
+			for i, d := range list.Devices {
+				status, _ := d.UpdateStatus()
+				if err != nil {
+					log.Printf("Error getting status for device %s: %v", d.Label, err)
+					continue
+				}
 				bs, _ := json.Marshal(status)
 
 				fmt.Printf("%d: %s (%s): %s %v\n", i, d.Label, d.Name, d.Health.State, string(bs))
 			}
 
-			log.Printf("Redoing using DevicesWithCapabilities method")
-			var metrics = []string{"battery", "temperature", "switch"}
-			
-			list2, err := cli.DevicesWithCapabilities(metrics)
-			if err != nil {
-				log.Printf("Error getting devicesWithCapabilities: %v", err)
-			}
-			for i, d := range list2.Items {
-				fmt.Printf("%d: %s (%s): %s\n", i, d.Device.Label, d.Device.Name, d.Device.Health.State)
-			}
-
 		}
-	
+
 	},
 }
 
