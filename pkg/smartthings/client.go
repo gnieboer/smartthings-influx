@@ -72,7 +72,7 @@ func (c Client) ConvertValueToFloat(metric string, value any) (float64, error) {
 		if !ok {
 			return 0, fmt.Errorf("there is no value map for metric '%s' and value '%s', can't convert", metric, stValue)
 		}
-		return metricMap[stValue], nil
+		return metricMap[strings.ToLower(stValue)], nil
 	}
 	return 0, nil
 }
@@ -87,7 +87,7 @@ func (c Client) ConvertValueToBinary(metric string, value any) (int8, error) {
 		if !ok {
 			return -1, nil
 		}
-		intVal := int8(metricMap[stValue])
+		intVal := int8(metricMap[strings.ToLower(stValue)])
 		if intVal < 2 && intVal > -1 {
 			return intVal, nil
 		}
