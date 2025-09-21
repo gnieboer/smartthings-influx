@@ -204,23 +204,20 @@ func (mon Monitor) Run() error {
 				}
 				fields := make(map[string]interface{})
 				fields["value"] = d.Health.State
+
 				// Get converted float value
-				convValue, err := mon.st.ConvertValueToFloat("health", d.Health.State)
+				fields["valueFloat"], err = mon.st.ConvertValueToFloat("health", d.Health.State)
 				if err != nil {
 					log.Printf("       ERROR: could not convert %-22s %-27s to number %v", d.Label, "health", err)
 					continue
-				} else {
-					fields["valueFloat"] = convValue
-				}
-
+				} 
 				// Get converted binary value
-				binaryValue, err := mon.st.ConvertValueToBinary("health", d.Health.State)
+				fields["valueBinary"], err = mon.st.ConvertValueToBinary("health", d.Health.State)
 				if err != nil {
 					log.Printf("     ERROR: could not convert %-22s %-27s to binary %v", d.Label, "health", err)
 					continue
-				} else {
-					fields["valueBinary"] = binaryValue
-				}
+				} 
+
 				point, err := client.NewPoint(
 					"health",
 					tags,
