@@ -58,7 +58,11 @@ func (mon Monitor) Run() error {
 
 		var i int = 0
 		for _, d := range devices.Devices {
-			d.UpdateStatus()
+			_, err := d.UpdateStatus()
+			if err != nil {
+				log.Printf("ERROR: could not update status for device %s: %v", d.Label, err)
+				continue
+			}
 			for _, comp := range d.Components {
 				for _, cap := range comp.Capabilities {
 					for _, m := range mon.metrics {

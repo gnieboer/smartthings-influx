@@ -175,6 +175,8 @@ func (c Client) get(endpoint string) ([]byte, error) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return []byte{}, err
+	} else if resp.StatusCode != 200 {
+		return []byte{}, fmt.Errorf("non-200 response from SmartThings API: %d, body: %s", resp.StatusCode, string(body))
 	}
 
 	return body, nil
